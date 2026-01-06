@@ -48,16 +48,27 @@ if (!$transactionId) {
     exit;
 }
 
-// mesma URL encriptada da Dutty Pay usada no pagamento
-$apiUrl = 'https://www.pagamentos-seguros.app/api-pix/79SNVAUnB8QDtofnzx3CIeS-MEfGM436ILsEX9PTTFaJjKuEJ3D0YJtZNOX1r61FJOV91G8eND7YTiZtgN5LOw';
+// === NITRO PAGAMENTOS HUB API ===
+// Chaves da API Nitro Pagamentos (mesmas usadas no gerarpix.php)
+$publicKey = 'pk_live_YY0NyWvVi2bWmA6CB3Ss6PIw1EXcGy9h';
+$privateKey = 'sk_live_aQRBskkLzRTWvPd6wB8yl7JtohxwpGwA';
 
-// monta URL de consulta com o transactionId
-$consultUrl = $apiUrl . '?transactionId=' . urlencode($transactionId);
+// Autenticação Basic Auth (formato: pk_:sk_ em Base64)
+$credentials = $publicKey . ':' . $privateKey;
+$authString = base64_encode($credentials);
+
+// Endpoint de consulta: GET /transactions/{id}
+$consultUrl = 'https://api.nitropagamento.app/transactions/' . urlencode($transactionId);
+
+// Log da consulta
+error_log("PIX Status - Consultando transação: $transactionId");
+error_log("PIX Status - URL: $consultUrl");
 
 $ch = curl_init($consultUrl);
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_HTTPHEADER     => [
+        'Authorization: Basic ' . $authString,
         'Content-Type: application/json'
     ],
 ]);
@@ -67,7 +78,12 @@ $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
 curl_close($ch);
 
+// Log da resposta
+error_log("PIX Status - HTTP Code: $httpCode");
+error_log("PIX Status - Response: " . substr($response, 0, 500));
+
 if ($response === false) {
+    error_log("PIX Status - cURL Error: $curlError");
     echo json_encode([
         'success' => false,
         'status'  => 'error',
@@ -78,6 +94,7 @@ if ($response === false) {
 }
 
 if ($httpCode < 200 || $httpCode >= 300) {
+    error_log("PIX Status - HTTP Error: $httpCode | Response: " . substr($response, 0, 200));
     echo json_encode([
         'success' => false,
         'status'   => 'error',
@@ -91,6 +108,7 @@ if ($httpCode < 200 || $httpCode >= 300) {
 
 $decoded = json_decode($response, true);
 if ($decoded === null) {
+    error_log("PIX Status - JSON decode error");
     echo json_encode([
         'success' => false,
         'status'  => 'error',
@@ -101,24 +119,44 @@ if ($decoded === null) {
     exit;
 }
 
-// tenta mapear o campo de status que a Dutty Pay devolver
-$statusRaw =
-    $decoded['status']
-    ?? ($decoded['data']['status'] ?? null)
-    ?? ($decoded['payment']['status'] ?? null)
-    ?? 'waiting_payment';
+// Verifica se a API retornou sucesso
+if (empty($decoded['success'])) {
+    error_log("PIX Status - API returned success=false: " . json_encode($decoded));
+    echo json_encode([
+        'success' => false,
+        'status' => 'error',
+        'error' => 'API retornou sucesso = false',
+        'response' => $decoded
+    ]);
+    exit;
+}
 
+// Extrai dados da resposta (Nitro retorna dentro de 'data')
+$data = $decoded['data'] ?? $decoded;
+
+// Pega o status da transação
+$statusRaw = $data['status'] ?? 'pendente';
 $status = strtolower($statusRaw);
 
-// Mapear status do novo gateway para o formato esperado
+// Log do status
+error_log("PIX Status - Transaction ID: " . ($data['id'] ?? 'N/A'));
+error_log("PIX Status - Status: $status");
+error_log("PIX Status - Amount: " . ($data['amount'] ?? 'N/A'));
+
+// Mapeia status da Nitro para o formato esperado
+// Nitro usa: "pendente", "pago", "cancelado"
 $paid = in_array($status, ['paid', 'approved', 'completed', 'success', 'pago', 'aprovado'], true);
 
-// Retornar no formato compatível com ambos os usos
+// Retorna no formato compatível
 echo json_encode([
     'success' => true,
     'paid' => $paid,
     'status' => $status,
-    'transaction' => $decoded, // Para compatibilidade com /api/transaction/
-    'data' => $decoded,
-    'response' => $decoded // Para compatibilidade com o formato do duffy
+    'amount' => $data['amount'] ?? null,
+    'payment_method' => $data['payment_method'] ?? null,
+    'created_at' => $data['created_at'] ?? null,
+    'paid_at' => $data['paid_at'] ?? null,
+    'transaction' => $data, // Para compatibilidade
+    'data' => $data,
+    'response' => $decoded
 ]);

